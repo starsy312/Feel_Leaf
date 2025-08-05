@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Feel Leaf 🌿</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(to bottom, #f0fdf4, #ccfbf1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #047857;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+    }
+
+    #chatbox {
+      width: 100%;
+      max-width: 500px;
+      height: 70vh;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #a7f3d0;
+      border-radius: 10px;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      backdrop-filter: blur(4px);
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      max-width: 80%;
+      display: inline-block;
+      opacity: 0;
+      animation: fadeIn 0.4s forwards;
+    }
+
+    .user {
+      text-align: right;
+      color: #10b981;
+      background: #d1fae5;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .bot {
+      text-align: left;
+      color: #374151;
+      background: #f9fafb;
+      align-self: flex-start;
+      margin-right: auto;
+      animation: scaleIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes scaleIn {
+      0% { transform: scale(0.95); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .typing {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing span {
+      width: 6px;
+      height: 6px;
+      background: #9ca3af;
+      border-radius: 50%;
+      animation: blink 1.2s infinite ease-in-out;
+    }
+
+    .typing span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes blink {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    #inputContainer {
+      margin-top: 20px;
+      display: flex;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    #inputMessage {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    #sendButton {
+      padding: 10px 20px;
+      margin-left: 10px;
+      background: #34d399;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #sendButton:hover {
+      background: #059669;
+    }
+
+    @media screen and (max-width: 600px) {
+      #chatbox {
+        height: 60vh;
+      }
+
+      #sendButton {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Feel Leaf 🌿 Chat</h2>
+  <div id="chatbox"></div>
+  <div id="inputContainer">
+    <input type="text" id="inputMessage" placeholder="Say something..." />
+    <button id="sendButton">Send</button>
+  </div>
+
+  <script>
+    const chatbox = document.getElementById('chatbox');
+    const inputMessage = document.getElementById('inputMessage');
+    const sendButton = document.getElementById('sendButton');
+
+    function addMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = `message ${sender}`;
+      msg.textContent = text;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function showTyping() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'message bot typing';
+      typingDiv.innerHTML = `<span></span><span></span><span></span>`;
+      chatbox.appendChild(typingDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+      return typingDiv;
+    }
+
+    async function sendMessage() {
+      const userText = inputMessage.value.trim();
+      if (!userText) return;
+
+      addMessage(userText, 'user');
+      inputMessage.value = '';
+
+      const typingMsg = showTyping();
+
+      try {
+        const res = await fetch('https://feel-leaf-4.onrender.com/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userText })
+        });
+
+        const data = await res.json();
+        typingMsg.remove();
+        addMessage(data.response, 'bot');
+      } catch (err) {
+        typingMsg.remove();
+        addMessage("Oops. The plant is feeling shy right now 🌱", 'bot');
+      }
+    }
+
+    sendButton.onclick = sendMessage;
+    inputMessage.addEventListener("keypress", e => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
