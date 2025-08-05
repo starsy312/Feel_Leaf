@@ -10,7 +10,7 @@ import json
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 # === Firebase Setup ===
-cred = credentials.Certificate(json.loads(os.environ["FIREBASE_KEY"]))
+cred = credentials.Certificate("firebase_key.json")
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://feel-leaf-default-rtdb.firebaseio.com/'  # Optional: insert your actual Realtime DB URL
 })
@@ -39,3 +39,4 @@ def emotion():
 # === Run App ===
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080)
+
