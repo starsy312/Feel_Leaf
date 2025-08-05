@@ -1,0 +1,27 @@
+# Ignore your Firebase secret
+feel-leaf-*.json
+
+# Python junk
+__pycache__/
+*.pyc
+*.pyo
+
+# Whisper build (if exists)
+whisper-bin-x64/
+*.exe
+*.dll
+
+# Virtual environment (if you have one)
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git crap
+.git/
+.gitignore
+
+# Logs
+*.log
